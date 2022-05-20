@@ -1,24 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ConnectModal from './components/ConnectModal';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from './utils/firebase.config';
+import { auth, db } from './utils/firebase.config';
 import CreatePost from './components/CreatePost';
-// import {collection, getDocs} from 'firebase/firestore'
+import { collection, getDocs } from 'firebase/firestore';
+import Post from './components/Post';
 
 const App = () => {
   const [user, setUser] = useState(null);
+  const [posts, setPosts] = useState([]);
 
   // const [userDb, setUserDb] = useState([]);
   // const usersdbCollection = collection(db, 'posts')
 
-  // useEffect(() => {
-  //   console.log('heueu')
-  //   const getUsers = async () => {
-  //     console.log('test')
-  //     const data = await getDocs(usersdbCollection)
-  //     console.log('data', data)
-  //   };
-  // }, []);
+  useEffect(() => {
+    getDocs(collection(db, 'posts')).then((res) =>
+      setPosts(res.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
+    );
+  }, []);
 
   // check if user is connect this method allow to get all connect data from user
   onAuthStateChanged(auth, (currentUser) => {
@@ -44,14 +43,18 @@ const App = () => {
         )}
 
         {user ? (
-          <CreatePost uid={user.uid} 
-          displayName={user.displayName} 
-          />
+          <CreatePost uid={user.uid} displayName={user.displayName} />
         ) : (
           <ConnectModal />
         )}
       </div>
-      <div className="posts-container"></div>
+      <div className="posts-container">
+        {user&&
+        posts.length > 0 &&
+          posts
+          .sort((a,b)=> b.date - a.date)
+            .map((post) => <Post post={post} key={post.id} user={user}/>)}
+      </div>
     </div>
   );
 };

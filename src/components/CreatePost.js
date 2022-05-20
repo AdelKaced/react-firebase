@@ -1,10 +1,12 @@
 import React, { useRef } from 'react';
+import { addDoc, collection } from 'firebase/firestore'
+import { db } from '../utils/firebase.config';
 
 const CreatePost = ({ uid, displayName }) => {
   const message = useRef('');
 
   const handlePost = async (e) => {
-    e.prevenDefault();
+    e.preventDefault();
     const data = {
         author : displayName,
         authorId: uid,
@@ -14,6 +16,9 @@ const CreatePost = ({ uid, displayName }) => {
 
     }
     console.log(data);
+    // add element on the database
+    await addDoc(collection(db, 'posts'), data);
+    message.current.value = ''
 
   };
 
