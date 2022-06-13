@@ -21,6 +21,7 @@ const App = () => {
 
   // check if user is connect this method allow to get all connect data from user
   onAuthStateChanged(auth, (currentUser) => {
+    console.log(currentUser);
     setUser(currentUser);
   });
 
@@ -28,6 +29,7 @@ const App = () => {
   const handleLogOut = async () => {
     await signOut(auth);
   };
+ 
 
   return (
     <div>
