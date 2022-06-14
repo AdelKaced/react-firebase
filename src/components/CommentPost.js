@@ -3,10 +3,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { auth, db } from '../utils/firebase.config';
 import { doc, updateDoc } from 'firebase/firestore';
 import CommentCard from './CommentCard';
+import { useDispatch } from 'react-redux';
+import { addComment } from '../feature/post.slice';
 
 const CommentPost = ({ post }) => {
   const [user, setUser] = useState(null);
   const comment = useRef();
+  const dispatch = useDispatch()
 
   const handleComment = (e) => {
     e.preventDefault();
@@ -27,7 +30,9 @@ const CommentPost = ({ post }) => {
       ];
     }
 
-    updateDoc(doc(db, 'posts', post.id), { comments: data });
+    updateDoc(doc(db, 'posts', post.id), { comments: data }).then(()=> {
+      dispatch(addComment([post.id, data]))
+    })
     comment.current.value = '';
   };
 

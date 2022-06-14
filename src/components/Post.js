@@ -61,7 +61,6 @@ const Post = ({ post, user }) => {
       ) : (
         <p>{editMess}</p>
       )}
-      test message
       <CommentPost post={post}/> 
     </div>
   );

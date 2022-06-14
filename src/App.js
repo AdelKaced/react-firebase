@@ -5,17 +5,22 @@ import { auth, db } from './utils/firebase.config';
 import CreatePost from './components/CreatePost';
 import { collection, getDocs } from 'firebase/firestore';
 import Post from './components/Post';
+import { useDispatch, useSelector } from 'react-redux';
+import { getPosts } from './feature/post.slice';
 
 const App = () => {
   const [user, setUser] = useState(null);
-  const [posts, setPosts] = useState([]);
+  // const [posts, setPosts] = useState([]);
+  const posts = useSelector( (state) =>  state.posts.posts);
+
+  const dispatch = useDispatch();
 
   // const [userDb, setUserDb] = useState([]);
   // const usersdbCollection = collection(db, 'posts')
 
   useEffect(() => {
     getDocs(collection(db, 'posts')).then((res) =>
-      setPosts(res.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
+      dispatch(getPosts(res.docs.map((doc) => ({ ...doc.data(), id: doc.id }))))
     );
   }, []);
 
@@ -26,7 +31,7 @@ const App = () => {
 
   // Disconnect user with fireBase
   const handleLogOut = async () => {
-    await signOut(auth);
+    await signOut(auth)
   };
 
   return (
@@ -49,11 +54,10 @@ const App = () => {
         )}
       </div>
       <div className="posts-container">
-        {user&&
-        posts.length > 0 &&
-          posts
-          .sort((a,b)=> b.date - a.date)
-            .map((post) => <Post post={post} key={post.id} user={user}/>)}
+        {user && posts &&
+          [...posts]
+            .sort((a, b) => b.date - a.date)
+            .map((post) => <Post post={post} key={post.id} user={user} />)}
       </div>
     </div>
   );
